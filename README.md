@@ -1,10 +1,6 @@
-Laravel 4 Simple Grid
-===================
+## Laravel 4 Simple Grid
 
-----------
-
-Installation
-============
+### Installation
 
 Add the following to your `composer.json` file:
 
@@ -13,7 +9,6 @@ Add the following to your `composer.json` file:
 ```
 
 Then, run `composer update reillo/grid` or `composer install` if you have not already installed packages.
-
 
 Publish asset:
 
