@@ -28,6 +28,11 @@ Publish config:
 php artisan config:publish reillo/grid
 ```
 
+Add the below line to the providers array in app/config/app.php configuration file (add at the end):
+```
+'Reillo\Grid\GridServiceProvider',
+```
+
 ### features
  - uses laravel paginator
  - support table and list renderer
