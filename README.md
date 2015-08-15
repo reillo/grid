@@ -1,4 +1,8 @@
-## Laravel 4 Simple Grid
+## Laravel 5 Simple Grid
+
+### For Laravel 4
+
+use the [0.2 branch](https://github.com/reillo/grid/tree/0.2)!
 
 ### Installation
 
