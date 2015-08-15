@@ -40,7 +40,7 @@ php artisan asset:publish reillo/grid
  - removable filters
 
 ### Usage
-
+see [example](https://github.com/reillo/grid/tree/master/src/Example).
 
 ### Todo
 Documentations
