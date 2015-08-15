@@ -1,0 +1,29 @@
+{
+  "name": "reillo/grid",
+  "description": "Simple laravel grid",
+  "keywords": [
+    "grid",
+    "table grid",
+    "listing",
+    "eloquent",
+    "laravel"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/reillo/grid",
+  "type": "library",
+  "authors": [
+    {
+      "name": "Ner Atillo",
+      "email": "atilloregner@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0",
+    "illuminate/support": "4.x"
+  },
+  "autoload": {
+    "psr-4": {
+      "Reillo\\Grid\\": "src/"
+    }
+  }
+}
