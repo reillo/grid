@@ -5,7 +5,7 @@
 Add the following to your `composer.json` file:
 
 ```json
-"reillo/grid": "dev-master"
+"reillo/grid": "~0.2"
 ```
 
 Then, run `composer update reillo/grid` or `composer install` if you have not already installed packages.
