@@ -14,22 +14,23 @@ Add the following to your `composer.json` file:
 
 Then, run `composer update reillo/grid` or `composer install` if you have not already installed packages.
 
-Publish config:
-
-```
-php artisan config:publish reillo/grid
-```
-
-Publish config:
-
-```
-php artisan view:publish reillo/grid
-```
 
 Publish asset:
 
 ```
 php artisan asset:publish reillo/grid
+```
+
+Publish view:
+
+```
+php artisan view:publish reillo/grid
+```
+
+Publish config:
+
+```
+php artisan config:publish reillo/grid
 ```
 
 ### features
