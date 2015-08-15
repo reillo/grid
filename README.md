@@ -9,7 +9,7 @@ use the [0.2 branch](https://github.com/reillo/grid/tree/0.2)!
 Add the following to your `composer.json` file:
 
 ```json
-"reillo/grid": "dev-master"
+"reillo/grid": "~0.2"
 ```
 
 Then, run `composer update reillo/grid` or `composer install` if you have not already installed packages.
@@ -30,6 +30,11 @@ Publish config:
 
 ```
 php artisan config:publish reillo/grid
+```
+
+Add the below line to the providers array in app/config/app.php configuration file (add at the end):
+```
+'Reillo\Grid\GridServiceProvider',
 ```
 
 ### features

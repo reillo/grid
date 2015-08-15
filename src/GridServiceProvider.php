@@ -22,7 +22,5 @@ class GridServiceProvider extends ServiceProvider {
     public function register()
     {
         //
-        $routes = __DIR__ . '/Example/routes.php';
-        if (file_exists($routes)) require $routes;
     }
 }

@@ -11,7 +11,6 @@ use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\ArrayableInterface;
 use Reillo\Grid\Helpers\Utils;
 use Reillo\Grid\Interfaces\GridRendererInterface;
-use Reillo\Grid\Renderer\ListRenderer;
 
 abstract class Grid implements ArrayableInterface, Countable, JsonableInterface {
 
