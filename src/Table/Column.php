@@ -8,7 +8,7 @@ class Column {
     const OPTION_LABEL       = 'label';
     const OPTION_RENDERER    = 'renderer';
     const OPTION_SORTABLE    = 'sortable';
-    const OPTION_CLASS       = '';
+    const OPTION_CLASS       = 'class';
     const OPTION_RAW_ATTRIBUTES  = 'raw_attributes';
     const OPTION_COLUMN      = 'column';
 
