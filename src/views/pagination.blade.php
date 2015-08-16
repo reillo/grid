@@ -1,3 +1,3 @@
 <div class="js-grid-pagination">
-    {{ $grid->getPagination() }}
+    {{ $grid->getPaginator()->links() }}
 </div>

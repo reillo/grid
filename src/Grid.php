@@ -1,52 +1,33 @@
 <?php namespace Reillo\Grid;
 
 use Countable;
-use Illuminate\Support\Facades\Input;
+use Reillo\Grid\Exception\GridException;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Paginator;
-use Illuminate\Support\Collection;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\ArrayableInterface;
 use Reillo\Grid\Helpers\Utils;
 use Reillo\Grid\Interfaces\GridRendererInterface;
 
-abstract class Grid implements ArrayableInterface, Countable, JsonableInterface {
+abstract class Grid implements Countable, ArrayableInterface, JsonableInterface {
 
-    protected $page = 0;
     protected $perPage = 25;
     protected $perPageSelection = [5,10,25,50,100];
 
     /**
-     * @var $query
+     * @var EloquentBuilder|GridException $query
      */
     protected $query;
 
     /**
-     * Query to select
-     *
-     * @var mixed
-     */
-    protected $querySelect = '*';
-
-    /**
-     * @var $query \Illuminate\Pagination\Paginator
+     * @var Paginator
      */
     protected $paginator;
 
     /**
-     * @var $totalCount int
-     */
-    protected $totalCount = 0;
-
-    /**
-     * @var $itemCollections Collection
-     */
-    protected $itemCollections = [];
-
-    /**
-     * @var $renderer GridRendererInterface
+     * @var GridRendererInterface
      */
     protected $renderer;
 
@@ -63,7 +44,6 @@ abstract class Grid implements ArrayableInterface, Countable, JsonableInterface 
      */
     function __construct()
     {
-        $this->page = Utils::config('page');
         $this->perPage = Utils::config('per_page');
         $this->perPageSelection = Utils::config('per_page_selection');
     }
@@ -83,31 +63,11 @@ abstract class Grid implements ArrayableInterface, Countable, JsonableInterface 
     /**
      * Return query builder
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return Illuminate\Database\Eloquent\Builder|Illuminate\Database\Query\Builder
      */
     public function getQuery()
     {
         return $this->query;
-    }
-
-    /**
-     * Set columns to select
-     *
-     * @param $querySelect
-     * @return $this
-     */
-    public function setQuerySelect($querySelect)
-    {
-        $this->querySelect = $querySelect;
-        return $this;
-    }
-
-    /**
-     * @return string|array
-     */
-    public function getQuerySelect()
-    {
-        return $this->querySelect;
     }
 
     /**
@@ -119,6 +79,7 @@ abstract class Grid implements ArrayableInterface, Countable, JsonableInterface 
     public function setRenderer(GridRendererInterface $renderer)
     {
         $this->renderer = $renderer;
+        $this->renderer->setGrid($this);
 
         return $this;
     }
@@ -143,7 +104,6 @@ abstract class Grid implements ArrayableInterface, Countable, JsonableInterface 
         $this->prepareQuery();
         $this->prepareFilters();
         $this->preparePagination();
-        $this->prepareGridRenderer();
 
         return $this;
     }
@@ -162,12 +122,23 @@ abstract class Grid implements ArrayableInterface, Countable, JsonableInterface 
      */
     protected function preparePagination()
     {
-        $this->setTotalCount();
         $this->setQuerySortable();
-        $this->setQueryOffset();
-        $this->prepareItemCollection();
+
+        // set paginator
+        $this->paginator = $this->getQuery()->paginate($this->getPerPage());
+        $this->paginator->appends(Request::except('ajax'));
 
         return $this;
+    }
+
+    /**
+     * Get Paginator instance
+     *
+     * @return Paginator
+     */
+    public function getPaginator()
+    {
+        return $this->paginator;
     }
 
     /**
@@ -185,157 +156,15 @@ abstract class Grid implements ArrayableInterface, Countable, JsonableInterface 
     abstract protected function prepareFilters();
 
     /**
-     * Prepare the grid renderer
-     *
-     * @return $this
-     */
-    protected function prepareGridRenderer()
-    {
-        $this->getRenderer()
-            ->setItems($this->getItemCollections())
-            ->setGrid($this);
-
-        return $this;
-    }
-
-    /**
-     * Do render grid
-     *
-     * @return string
-     */
-    public function renderGrid()
-    {
-        return $this->getRenderer()->render();
-    }
-
-    /**
-     * Set the total count of the result
-     *
-     * @return void
-     */
-    private function setTotalCount()
-    {
-        $this->totalCount = $this->query->count();
-    }
-
-    /**
-     * This will just set the offset and limit of the query
-     *
-     * @return void
-     */
-    private function setQueryOffset()
-    {
-        // create paginator instance
-        $this->setPaginator();
-
-        $limit = $this->getPaginator()->getPerPage();
-        $offset = $this->getPaginator()->getPerPage() * ($this->getPaginator()->getCurrentPage() - 1);
-
-        $this->getQuery()->skip($offset)->take($limit);
-    }
-
-    /**
-     * Execute query and set the item collections
-     *
-     * @return void
-     */
-    private function prepareItemCollection()
-    {
-        $this->getQuery()->select($this->getQuerySelect());
-
-        // set item collections
-        $this->itemCollections = $this->getQuery()->get();
-        $this->getPaginator()->setItems($this->getItemCollections());
-    }
-
-    /**
-     * Get the collections of items
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function getItemCollections()
-    {
-        return $this->itemCollections;
-    }
-
-    /**
-     * Get the total count of the query
-     *
-     * @return int
-     */
-    public function getTotalCount()
-    {
-        return $this->totalCount;
-    }
-
-    /**
-     * Get the total count of the query
-     *
-     * @return int
-     */
-    public function count()
-    {
-        return $this->getTotalCount();
-    }
-
-    /**
-     * Get Pagination Links
-     *
-     * @param string $view
-     * @return mixed
-     */
-    public function getPagination($view = null)
-    {
-        return $this->getPaginator()->links($view);
-    }
-
-    /**
-     * Set Paginator Instance
-     *
-     * @return void
-     */
-    protected function setPaginator()
-    {
-        $this->paginator = Paginator::make([], $this->getTotalCount(), $this->getPerPage());
-        $this->paginator->fragment($this->fragment());
-
-        // append paginator request
-        $this->paginator->appends(Request::except('ajax'));
-        $this->paginator->getFactory()->setCurrentPage($this->getPage());
-    }
-
-    /**
-     * Get paginator instance
-     *
-     * @return \Illuminate\Pagination\Paginator
-     */
-    public function getPaginator()
-    {
-        return $this->paginator;
-    }
-
-    /**
-     * Set per page
-     *
-     * @param int $perPage
-     * @return $this
-     */
-    public function setPerPage($perPage)
-    {
-        $this->perPage = $perPage;
-        return $this;
-    }
-
-    /**
      * Get per page
      *
      * @return int
      */
     public function getPerPage()
     {
-        $per_page = Input::get('per_page', $this->perPage);
+        $per_page = Request::input('per_page', $this->perPage);
 
-        if ($this->isValidPageNumber($per_page)) {
+        if ($per_page >= 1 && filter_var($per_page, FILTER_VALIDATE_INT) !== false) {
             return $per_page;
         }
 
@@ -343,43 +172,9 @@ abstract class Grid implements ArrayableInterface, Countable, JsonableInterface 
     }
 
     /**
-     * Set current page
+     * Get Per page selection
      *
-     * @param int $page
      * @return $this
-     */
-    public function setPage($page)
-    {
-        $this->page = $page;
-        return $this;
-    }
-
-    /**
-     * Get current page
-     *
-     * @return int
-     */
-    public function getPage()
-    {
-        return $this->page;
-    }
-
-    /**
-     * set Per page selection
-     *
-     * @param int $perPageSelection
-     * @return $this
-     */
-    public function setPerPageSelection($perPageSelection)
-    {
-        $this->perPageSelection = $perPageSelection;
-        return $this;
-    }
-
-    /**
-     * Get per page selection
-     *
-     * @return array
      */
     public function getPerPageSelection()
     {
@@ -387,14 +182,23 @@ abstract class Grid implements ArrayableInterface, Countable, JsonableInterface 
     }
 
     /**
-     * Check if number is valid for paginator
+     * Get item collections
      *
-     * @param mixed $page
-     * @return bool
+     * @return array
      */
-    public function isValidPageNumber($page)
+    public function getItems()
     {
-        return $page >= 1 && filter_var($page, FILTER_VALIDATE_INT) !== false;
+        return $this->getPaginator()->getItems();
+    }
+
+    /**
+     * Get item collections
+     *
+     * @return array
+     */
+    public function count()
+    {
+        return $this->getPaginator()->count();
     }
 
     /**
@@ -405,9 +209,8 @@ abstract class Grid implements ArrayableInterface, Countable, JsonableInterface 
      */
     public function createUrl(array $parameters = [])
     {
-        $baseUrl = $this->getPaginator()->getFactory()->getCurrentUrl();
+        $baseUrl = $this->getBaseURL();
 
-        // create and merge parameters
         $parameters = array_merge(Request::except('ajax'), $parameters);
 
         // build url query string
@@ -425,11 +228,7 @@ abstract class Grid implements ArrayableInterface, Countable, JsonableInterface 
      */
     public function fragment($fragment = null)
     {
-        if (is_null($fragment)) return $this->fragment;
-
-        $this->fragment = $fragment;
-
-        return $this;
+        return $this->getPaginator()->fragment($fragment);
     }
 
     /**
@@ -439,7 +238,7 @@ abstract class Grid implements ArrayableInterface, Countable, JsonableInterface 
      */
     protected function buildFragment()
     {
-        return $this->fragment ? '#'.$this->fragment : '';
+        return $this->fragment() ? '#'.$this->fragment() : '';
     }
 
     /**
@@ -460,23 +259,18 @@ abstract class Grid implements ArrayableInterface, Countable, JsonableInterface 
      */
     public function setBaseURL($url)
     {
-        $this->getPaginator()->setBaseUrl($url);
-
+        $this->getPaginator()->getFactory($url);
         return $this;
     }
 
     /**
-     * Add a query string value to the paginator.
+     * Do render grid
      *
-     * @param  string  $key
-     * @param  string  $value
-     * @return $this
+     * @return string
      */
-    public function addParameter($key, $value)
+    public function renderGrid()
     {
-        $this->getPaginator()->addQuery($key, $value);
-
-        return $this;
+        return $this->getRenderer()->render();
     }
 
     /**
@@ -497,7 +291,7 @@ abstract class Grid implements ArrayableInterface, Countable, JsonableInterface 
      */
     public function isAjax()
     {
-        return Request::ajax() && Input::get('ajax');
+        return Request::ajax() && Request::input('ajax');
     }
 
     /**
@@ -527,10 +321,4 @@ abstract class Grid implements ArrayableInterface, Countable, JsonableInterface 
     {
         return Response::json($this->toArray());
     }
-
 }
-
-
-
-
-

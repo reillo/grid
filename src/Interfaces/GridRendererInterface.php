@@ -14,6 +14,13 @@ interface GridRendererInterface {
     public function setView($view);
 
     /**
+     * Set grid renderer view
+     *
+     * @return string
+     */
+    public function getView();
+
+    /**
      * set Grid
      *
      * @param Grid $grid
@@ -27,28 +34,6 @@ interface GridRendererInterface {
      * @return Grid
      */
     public function getGrid();
-
-    /**
-     * Set item collections
-     *
-     * @param Collection $items
-     * @return $this
-     */
-    public function setItems(Collection $items);
-
-    /**
-     * Get items collection
-     *
-     * @return mixed
-     */
-    public function getItems();
-
-    /**
-     * return total number of items
-     *
-     * @return int
-     */
-    public function hasItems();
 
     /**
      * render grid

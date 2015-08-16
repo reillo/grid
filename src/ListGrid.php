@@ -12,6 +12,16 @@ abstract class ListGrid extends Grid {
     {
         parent::__construct();
 
+        $this->prepareGridRenderer();
+    }
+
+    /**
+     * Prepare grid rendered
+     *
+     * @return Void
+     */
+    protected function prepareGridRenderer()
+    {
         $renderer = new ListRenderer();
         $renderer->setView(Utils::config('renderer.list_view'));
 

@@ -72,13 +72,29 @@ class Column {
     /**
      * Create Column instance
      *
-     * @param null|string $column_id
+     * @param string $columnId
      * @param array $options
      */
-    function __construct($column_id = null, array $options = [])
+    function __construct($columnId, array $options = [])
     {
-        $this->setColumnId($column_id);
+        $this->setColumnId($columnId);
         $this->setOptions($options);
+    }
+
+    /**
+     * Quick create column instance
+     *
+     * @param string|Column $columnId
+     * @param array $options
+     * @return string|Column
+     */
+    public static function make($columnId, array $options = []) {
+        // is an instance of column?
+        if ($columnId instanceof self) {
+            return $columnId;
+        }
+
+        return new self($columnId, $options);
     }
 
     /**

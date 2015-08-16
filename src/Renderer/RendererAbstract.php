@@ -6,14 +6,14 @@ use Reillo\Grid\Grid;
 abstract class RendererAbstract {
 
     /**
+     * @var string
+     */
+    protected $view;
+
+    /**
      * @var Grid
      */
     protected $grid;
-
-    /**
-     * @var Collection
-     */
-    protected $items;
 
     /**
      * Set Grid instance
@@ -28,6 +28,26 @@ abstract class RendererAbstract {
     }
 
     /**
+     * has items
+     *
+     * @return int
+     */
+    public function hasItems()
+    {
+        return $this->getGrid()->count();
+    }
+
+    /**
+     * Get items
+     *
+     * @return int
+     */
+    public function getItems()
+    {
+        return $this->getGrid()->getItems();
+    }
+
+    /**
      * Get the Grid instance
      *
      * @return Grid
@@ -38,34 +58,24 @@ abstract class RendererAbstract {
     }
 
     /**
-     * Set the items to render
+     * Set view path
      *
-     * @param  Collection $items
+     * @param string $view
      * @return $this
      */
-    public function setItems(Collection $items) {
-        $this->items = $items;
+    public function setView($view)
+    {
+        $this->view = $view;
         return $this;
     }
 
     /**
-     * Get item Collection
+     * Get view path
      *
-     * @return mixed
+     * @return string
      */
-    public function getItems()
+    public function getView()
     {
-        return $this->items;
+        return $this;
     }
-
-    /**
-     * Return the total number of items
-     *
-     * @return int
-     */
-    public function hasItems()
-    {
-        return count($this->items);
-    }
-
 }

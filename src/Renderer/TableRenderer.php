@@ -1,6 +1,6 @@
 <?php namespace Reillo\Grid\Renderer;
 
-use Reillo\Grid\Helpers\Utils;
+use Illuminate\Support\Facades\View;
 use Reillo\Grid\Interfaces\GridRendererInterface;
 
 class TableRenderer extends RendererAbstract implements GridRendererInterface {
@@ -9,11 +9,6 @@ class TableRenderer extends RendererAbstract implements GridRendererInterface {
      * @var array
      */
     protected $columns = [];
-
-    /**
-     * @var $view string
-     */
-    protected $view;
 
     /**
      * @var $view string
@@ -58,18 +53,6 @@ class TableRenderer extends RendererAbstract implements GridRendererInterface {
     }
 
     /**
-     * set view path
-     *
-     * @param $view string
-     * @return $this
-     */
-    public function setView($view)
-    {
-        $this->view = $view;
-        return $this;
-    }
-
-    /**
      * set header view path
      *
      * @param $headerView
@@ -103,6 +86,7 @@ class TableRenderer extends RendererAbstract implements GridRendererInterface {
         if (!empty($this->headerCached)) {
             return $this->headerCached;
         }
+
         return $this->headerCached = View::make($this->headerView)->with($this->getViewData())->render();
     }
 
