@@ -13,7 +13,7 @@ var Grid = function($container, options) {
      * @type {Object}
      */
     this.options = {
-        seoFriendlyUrl: true,
+        history: true,
         loadingClass: 'loading',
         fields: 'input.js-grid-input, select.js-grid-input',
         onSuccess: function(result, _me){},
@@ -38,7 +38,7 @@ Grid.prototype = {
 
         /* Revert to a previously saved state, if back or forward */
         window.addEventListener('popstate', function () {
-            if (_me.options.seoFriendlyUrl && 'history' in window && 'pushState' in history) {
+            if (_me.options.history && 'history' in window && 'pushState' in history) {
                 _me.update(document.URL);
             }
         });
@@ -155,7 +155,7 @@ Grid.prototype = {
      * @param {string} url
      */
     history: function(url) {
-        if( this.options.seoFriendlyUrl && 'history' in window && 'pushState' in history ) {
+        if( this.options.history && 'history' in window && 'pushState' in history ) {
             // only push to history if flag as true and browser supports history pushState
             if (history.pathname !== url) {
                 history.pushState({ url: url }, "Grid", url);
