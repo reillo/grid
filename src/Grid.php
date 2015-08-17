@@ -265,6 +265,18 @@ abstract class Grid implements Countable, ArrayableInterface, JsonableInterface 
     }
 
     /**
+     * Append Query string to paginator
+     *
+     * @param  array  $queryString
+     * @return $this
+     */
+    public function appendQueryString(array $queryString = [])
+    {
+        $this->getPaginator()->appends($queryString);
+        return $this;
+    }
+
+    /**
      * Do render grid
      *
      * @return string
