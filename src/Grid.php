@@ -63,7 +63,7 @@ abstract class Grid implements Countable, ArrayableInterface, JsonableInterface 
     /**
      * Return query builder
      *
-     * @return Illuminate\Database\Eloquent\Builder|Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
     public function getQuery()
     {
@@ -163,7 +163,6 @@ abstract class Grid implements Countable, ArrayableInterface, JsonableInterface 
     public function getPerPage()
     {
         $per_page = Request::input('per_page', $this->perPage);
-
         if ($per_page >= 1 && filter_var($per_page, FILTER_VALIDATE_INT) !== false) {
             return $per_page;
         }
