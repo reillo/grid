@@ -151,7 +151,7 @@ abstract class Grid implements Countable, ArrayableInterface, JsonableInterface 
     /**
      * Prepare filters
      *
-     * @return mixed
+     * @return $this
      */
     abstract protected function prepareFilters();
 

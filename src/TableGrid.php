@@ -56,6 +56,8 @@ abstract class TableGrid extends Grid {
         parent::prepareGrid();
 
         $this->getRenderer()->setColumns($this->columns);
+
+        return $this;
     }
 
     /**
