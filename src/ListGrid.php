@@ -40,7 +40,7 @@ abstract class ListGrid extends Grid {
                 'js-grid-renderer' => $this->renderGrid(),
                 'js-grid-pagination' => $this->render('grid::pagination'),
                 'js-grid-pagination-info' => $this->render('grid::pagination_info'),
-                'js-grid-removable-filter' => $this->render('grid::removable_filter'),
+                // 'js-grid-removable-filter' => $this->render('grid::removable_filter'),
             ],
             'status' => 'success'
         ];
