@@ -143,10 +143,25 @@ abstract class TableGrid extends Grid {
         /**@var $column Column*/
         foreach ($this->columns as $column) {
             if ($dir = $this->getSortableDir($column)) {
-                $this->getQuery()->orders = [];
+                // remove default orders by
+                $this->getQueryBuilder()->orders = [];
                 $this->getQuery()->orderBy($column->getColumn(), $dir);
             }
         }
+    }
+
+    /**
+     * Get the query builder
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    protected function getQueryBuilder()
+    {
+        if ($this->getQuery() instanceof \Illuminate\Database\Query\Builder) {
+            return  $this->getQuery();
+        }
+
+        return $this->getQuery()->getQuery();
     }
 
     /**
@@ -170,13 +185,27 @@ abstract class TableGrid extends Grid {
     /**
      * Sortable column method
      *
-     * @param Column $column
+     * @param  Column  $column
+     * @param  bool  $readDefault
      * @return null|string
      */
-    public function getSortableDir(Column $column)
+    public function getSortableDir(Column $column, $readDefault = true)
     {
-        if ($column->isSortable() && $column->getColumnId() == Request::input('sort_by')) {
-            return  Request::input('sort_dir', 'desc') == 'desc' ? 'asc' : 'desc';
+        if ($column->isSortable()) {
+            if ($column->getColumnId() == Request::input('sort_by')) {
+                return Request::input('sort_dir', 'desc') == 'desc' ? 'asc' : 'desc';
+            } else {
+                // read default order from query
+                if ($readDefault) {
+                    $default = $this->getQueryBuilder()->orders;
+                    if (!empty($default)) {
+                        $order = $this->getQueryBuilder()->orders[0];
+                        if (array_get($order, 'column') == $column->getColumn()) {
+                            return array_get($order, 'direction') == 'desc' ? 'asc' : 'desc';
+                        }
+                    }
+                }
+            }
         }
 
         return null;
