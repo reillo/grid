@@ -143,6 +143,7 @@ abstract class TableGrid extends Grid {
         /**@var $column Column*/
         foreach ($this->columns as $column) {
             if ($dir = $this->getSortableDir($column)) {
+                $this->getQuery()->orders = [];
                 $this->getQuery()->orderBy($column->getColumn(), $dir);
             }
         }
