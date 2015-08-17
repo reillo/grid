@@ -43,7 +43,7 @@ abstract class Grid implements Countable, ArrayableInterface, JsonableInterface 
      *
      * @var
      */
-    protected $queryString = [];
+    protected $queryString;
 
     /**
      * Create new instance of grid
