@@ -39,6 +39,13 @@ abstract class Grid implements Countable, ArrayableInterface, JsonableInterface 
     protected $fragment;
 
     /**
+     * Additional url query string
+     *
+     * @var
+     */
+    protected $queryString = [];
+
+    /**
      * Create new instance of grid
      *
      */
@@ -210,7 +217,8 @@ abstract class Grid implements Countable, ArrayableInterface, JsonableInterface 
     {
         $baseUrl = $this->getBaseURL();
 
-        $parameters = array_merge(Request::except('ajax'), $parameters);
+        $defaultParam = array_merge($this->queryString, Request::except('ajax'));
+        $parameters = array_merge($defaultParam, $parameters);
 
         // build url query string
         $query_string = http_build_query($parameters, null, '&');
@@ -260,7 +268,8 @@ abstract class Grid implements Countable, ArrayableInterface, JsonableInterface 
     public function setBaseURL($url, array $queryString = [])
     {
         $this->getPaginator()->getFactory()->setBaseUrl($url);
-        $this->getPaginator()->appends($queryString);
+        $this->appendQueryString($queryString);
+
         return $this;
     }
 
@@ -273,6 +282,7 @@ abstract class Grid implements Countable, ArrayableInterface, JsonableInterface 
     public function appendQueryString(array $queryString = [])
     {
         $this->getPaginator()->appends($queryString);
+        $this->queryString = array_merge($this->queryString, $queryString);
         return $this;
     }
 
