@@ -253,12 +253,14 @@ abstract class Grid implements Countable, ArrayableInterface, JsonableInterface 
     /**
      * Set paginator target/base url
      *
-     * @param string $url - The target url that the list will request or submitted to
+     * @param  string  $url
+     * @param  array  $queryString
      * @return $this
      */
-    public function setBaseURL($url)
+    public function setBaseURL($url, array $queryString = [])
     {
-        $this->getPaginator()->getFactory($url);
+        $this->getPaginator()->getFactory()->setBaseUrl($url);
+        $this->getPaginator()->appends($queryString);
         return $this;
     }
 
