@@ -34,7 +34,7 @@ abstract class RendererAbstract {
      */
     public function hasItems()
     {
-        return $this->getGrid()->count();
+        return count($this->getGrid()->getItems());
     }
 
     /**

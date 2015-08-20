@@ -12,20 +12,8 @@ abstract class ListGrid extends Grid {
     {
         parent::__construct();
 
-        $this->prepareGridRenderer();
-    }
-
-    /**
-     * Prepare grid rendered
-     *
-     * @return Void
-     */
-    protected function prepareGridRenderer()
-    {
-        $renderer = new ListRenderer();
-        $renderer->setView(Utils::config('renderer.list_view'));
-
-        $this->setRenderer($renderer);
+        $this->setRendererView(Utils::config('view.renderer.list'));
+        $this->setRenderer(new ListRenderer());
     }
 
     /**
@@ -38,9 +26,8 @@ abstract class ListGrid extends Grid {
         return [
             'replace' => [
                 'js-grid-renderer' => $this->renderGrid(),
-                'js-grid-pagination' => $this->render('grid::pagination'),
-                'js-grid-pagination-info' => $this->render('grid::pagination_info'),
-                // 'js-grid-removable-filter' => $this->render('grid::removable_filter'),
+                'js-grid-pagination' => $this->renderPagination(),
+                'js-grid-pagination-info' => $this->renderPaginationInfo(),
             ],
             'status' => 'success'
         ];

@@ -2,14 +2,19 @@
 
 return array(
     'per_page'            => 10,
-
     'per_page_selection'  => array(5, 10, 30, 100),
 
-    'renderer' => array(
-        'table' => array(
-            'table_view'        => 'grid::renderer.table.table',
-            'table_header_view' => 'grid::renderer.table.table_header',
+    'view' => array(
+        'renderer' => array(
+            'list' => 'grid::renderer.list',
+            'table' => 'grid::renderer.table',
+            'table_header' => 'grid::renderer.table_header',
         ),
-        'list_view' => 'grid::renderer.list'
+
+        'no_result' => 'grid::no_result',
+        'pagination' => 'grid::pagination',
+        'pagination_info' => 'grid::pagination_info',
+        'per_page' => 'grid::per_age',
+        'removable_filter' => 'grid::removable_filter',
     )
 );

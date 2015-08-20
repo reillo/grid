@@ -1,4 +1,5 @@
 <?php namespace Reillo\Grid\Traits;
+use Reillo\Grid\Helpers\Utils;
 
 /**
  * Class FilterRemovableTrait
@@ -13,6 +14,46 @@ trait RemovableFiltersTrait {
      * @var array
      */
     protected $removableFilters = [];
+
+    /**
+     * @var string
+     */
+    protected $removableView;
+
+    /**
+     * Set removable view
+     *
+     * @param  $view
+     * @return $this
+     */
+    public function setRemovableView($view) {
+        $this->removableView = $view;
+        return $this;
+    }
+
+    /**
+     * Get removable view
+     *
+     * @return string
+     */
+    public function getRemovableView()
+    {
+        // if empty then use default
+        if (empty($this->removableView)) {
+            $this->removableView = Utils::config('view.removable_filter');
+        }
+
+        return $this->removableView;
+    }
+
+    /**
+     * Get removable view
+     *
+     * @return string
+     */
+    public function renderRemovableFilter() {
+        return $this->render($this->getRemovableView());
+    }
 
     /**
      * Return all removable filters

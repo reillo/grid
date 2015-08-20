@@ -7,14 +7,6 @@ use Reillo\Grid\Interfaces\GridRendererInterface;
 class ListRenderer extends RendererAbstract implements GridRendererInterface {
 
     /**
-     * Create list renderer instance
-     */
-    function __construct()
-    {
-        $this->setView(Utils::config('renderer.list_view'));
-    }
-
-    /**
      * Get the view data
      *
      * @return array

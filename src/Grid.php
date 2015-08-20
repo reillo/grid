@@ -1,6 +1,5 @@
 <?php namespace Reillo\Grid;
 
-use Countable;
 use Reillo\Grid\Exception\GridException;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Response;
@@ -11,7 +10,7 @@ use Illuminate\Support\Contracts\ArrayableInterface;
 use Reillo\Grid\Helpers\Utils;
 use Reillo\Grid\Interfaces\GridRendererInterface;
 
-abstract class Grid implements Countable, ArrayableInterface, JsonableInterface {
+abstract class Grid implements ArrayableInterface, JsonableInterface {
 
     protected $perPage = 25;
     protected $perPageSelection = [5,10,25,50,100];
@@ -43,7 +42,32 @@ abstract class Grid implements Countable, ArrayableInterface, JsonableInterface 
      *
      * @var
      */
-    protected $queryString;
+    protected $queryString = [];
+
+    /**
+     * @var string
+     */
+    protected $rendererView;
+
+    /**
+     * @var string
+     */
+    protected $noResultView;
+
+    /**
+     * @var string
+     */
+    protected $paginationView;
+
+    /**
+     * @var string
+     */
+    protected $paginationInfoView;
+
+    /**
+     * @var string
+     */
+    protected $perPageView;
 
     /**
      * Create new instance of grid
@@ -53,12 +77,73 @@ abstract class Grid implements Countable, ArrayableInterface, JsonableInterface 
     {
         $this->perPage = Utils::config('per_page');
         $this->perPageSelection = Utils::config('per_page_selection');
+
+        $this->setRendererView(Utils::config('view.renderer.list'));
+        $this->setPerPageView(Utils::config('view.per_page'));
+        $this->setNoResultView(Utils::config('view.no_result'));
+        $this->setPaginationView(Utils::config('view.pagination'));
+        $this->setPaginationInfoView(Utils::config('view.pagination_info'));
+    }
+
+    /**
+     * Set renderer view
+     *
+     * @param  string  $view
+     * @return $this
+     */
+    public function setRendererView($view) {
+        $this->rendererView = $view;
+        return $this;
+    }
+
+    /**
+     * Set Per Page View
+     *
+     * @param  string  $view
+     * @return $this
+     */
+    public function setPerPageView($view) {
+        $this->perPageView = $view;
+        return $this;
+    }
+
+    /**
+     * Set no result view
+     *
+     * @param  string  $view
+     * @return $this
+     */
+    public function setNoResultView($view) {
+        $this->noResultView = $view;
+        return $this;
+    }
+
+    /**
+     * Set pagination View
+     *
+     * @param  string  $view
+     * @return $this
+     */
+    public function setPaginationView($view) {
+        $this->paginationView = $view;
+        return $this;
+    }
+
+    /**
+     * Set pagination info view
+     *
+     * @param  string  $view
+     * @return $this
+     */
+    public function setPaginationInfoView($view) {
+        $this->paginationInfoView = $view;
+        return $this;
     }
 
     /**
      * Set Query Builder
      *
-     * @param $query
+     * @param  $query
      * @return $this
      */
     public function setQuery($query)
@@ -80,7 +165,7 @@ abstract class Grid implements Countable, ArrayableInterface, JsonableInterface 
     /**
      * Set renderer handler
      *
-     * @param GridRendererInterface $renderer
+     * @param  GridRendererInterface  $renderer
      * @return $this
      */
     public function setRenderer(GridRendererInterface $renderer)
@@ -197,20 +282,11 @@ abstract class Grid implements Countable, ArrayableInterface, JsonableInterface 
         return $this->getPaginator()->getItems();
     }
 
-    /**
-     * Get item collections
-     *
-     * @return array
-     */
-    public function count()
-    {
-        return $this->getPaginator()->count();
-    }
 
     /**
      * Create url for navigation
      *
-     * @param array $parameters
+     * @param  array  $parameters
      * @return string
      */
     public function createUrl(array $parameters = [])
@@ -287,25 +363,68 @@ abstract class Grid implements Countable, ArrayableInterface, JsonableInterface 
     }
 
     /**
-     * Do render grid
-     *
-     * @return string
-     */
-    public function renderGrid()
-    {
-        return $this->getRenderer()->render();
-    }
-
-    /**
      * Render view and pass the grid instance
      *
-     * @param $view
+     * @param  string  $view
      * @return string
      */
     public function render($view)
     {
         return View::make($view)->with(['grid'=>$this])->render();
     }
+
+    /**
+     * Do render grid
+     *
+     * @return string
+     */
+    public function renderGrid()
+    {
+        // set the renderer view
+        $this->getRenderer()->setView($this->rendererView);
+        return $this->getRenderer()->render();
+    }
+
+    /**
+     * Do render per page
+     *
+     * @return string
+     */
+    public function renderPerPage()
+    {
+        return $this->render($this->perPageView);
+    }
+
+    /**
+     * Do render pagination
+     *
+     * @return string
+     */
+    public function renderPagination()
+    {
+        return $this->render($this->paginationView);
+    }
+
+    /**
+     * Do render grid
+     *
+     * @return string
+     */
+    public function renderPaginationInfo()
+    {
+        return $this->render($this->paginationInfoView);
+    }
+
+    /**
+     * Do render no result
+     *
+     * @return string
+     */
+    public function renderNoResult()
+    {
+        return $this->render($this->noResultView);
+    }
+
 
     /**
      * Check if ajax request

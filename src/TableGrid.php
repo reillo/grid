@@ -20,23 +20,10 @@ abstract class TableGrid extends Grid {
     function __construct()
     {
         parent::__construct();
+        $this->setRendererView(Utils::config('view.renderer.table'));
+        $this->setRenderer(new TableRenderer());
 
-        $this->prepareGridRenderer();
         $this->prepareColumns();
-    }
-
-    /**
-     * Prepare grid rendered
-     *
-     * @return Void
-     */
-    protected function prepareGridRenderer()
-    {
-        $renderer = (new TableRenderer());
-        $renderer->setView(Utils::config('renderer.table.table_view'));
-        $renderer->setHeaderView(Utils::config('renderer.table.table_header_view'));
-
-        $this->setRenderer($renderer);
     }
 
     /**
@@ -56,7 +43,6 @@ abstract class TableGrid extends Grid {
         parent::prepareGrid();
 
         $this->getRenderer()->setColumns($this->columns);
-
         return $this;
     }
 
@@ -223,10 +209,8 @@ abstract class TableGrid extends Grid {
         return [
             'replace' => [
                 'js-grid-renderer' => $this->renderGrid(),
-                'js-grid-pagination' => $this->render('grid::pagination'),
-                'js-grid-pagination-info' => $this->render('grid::pagination_info'),
-                // 'js-grid-removable-filter' => $this->render('grid::removable_filter'),
-                // 'js-grid-per-page' => $this->render('grid::per_page'),
+                'js-grid-pagination' => $this->renderPagination(),
+                'js-grid-pagination-info' => $this->renderPaginationInfo(),
             ],
             'status' => 'success'
         ];
