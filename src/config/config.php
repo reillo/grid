@@ -14,7 +14,7 @@ return array(
         'no_result' => 'grid::no_result',
         'pagination' => 'grid::pagination',
         'pagination_info' => 'grid::pagination_info',
-        'per_page' => 'grid::per_age',
+        'per_page' => 'grid::per_page',
         'removable_filter' => 'grid::removable_filter',
     )
 );
