@@ -2,7 +2,7 @@
 
 ### For Laravel 4
 
-use the [0.2 branch](https://github.com/reillo/grid/tree/0.2)!
+use the [0.3 branch](https://github.com/reillo/grid/tree/0.3)!
 
 ### Installation
 
