@@ -291,7 +291,7 @@ abstract class Grid implements ArrayableInterface, JsonableInterface {
      */
     public function createUrl(array $parameters = [])
     {
-        $baseUrl = $this->getBaseURL();
+        $baseUrl = $this->getBaseUrl();
 
         $defaultParam = array_merge($this->queryString, Request::except('ajax'));
         $parameters = array_merge($defaultParam, $parameters);
@@ -329,7 +329,7 @@ abstract class Grid implements ArrayableInterface, JsonableInterface {
      *
      * @return string
      */
-    public function getBaseURL()
+    public function getBaseUrl()
     {
         return $this->getPaginator()->getFactory()->getCurrentUrl();
     }
@@ -341,7 +341,7 @@ abstract class Grid implements ArrayableInterface, JsonableInterface {
      * @param  array  $queryString
      * @return $this
      */
-    public function setBaseURL($url, array $queryString = [])
+    public function setBaseUrl($url, array $queryString = [])
     {
         $this->getPaginator()->getFactory()->setBaseUrl($url);
         $this->appendQueryString($queryString);
