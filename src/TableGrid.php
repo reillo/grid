@@ -174,23 +174,21 @@ abstract class TableGrid extends Grid {
      * Sortable column method
      *
      * @param  Column  $column
-     * @param  bool  $readDefault
      * @return null|string
      */
-    public function getSortableDir(Column $column, $readDefault = true)
+    public function getSortableDir(Column $column)
     {
         if ($column->isSortable()) {
-            if ($column->getColumnId() == Request::input('sort_by')) {
+            $sortBy = Request::input('sort_by');
+            if ($column->getColumnId() == $sortBy) {
                 return Request::input('sort_dir', 'desc') == 'desc' ? 'asc' : 'desc';
-            } else {
+            } else if (!empty($sortBy)) {
                 // read default order from query
-                if ($readDefault) {
-                    $default = $this->getQueryBuilder()->orders;
-                    if (!empty($default)) {
-                        $order = $this->getQueryBuilder()->orders[0];
-                        if (array_get($order, 'column') == $column->getColumn()) {
-                            return array_get($order, 'direction') == 'desc' ? 'asc' : 'desc';
-                        }
+                $default = $this->getQueryBuilder()->orders;
+                if (!empty($default)) {
+                    $order = $this->getQueryBuilder()->orders[0];
+                    if (array_get($order, 'column') == $column->getColumn()) {
+                        return array_get($order, 'direction') == 'desc' ? 'asc' : 'desc';
                     }
                 }
             }
