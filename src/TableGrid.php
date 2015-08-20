@@ -182,7 +182,7 @@ abstract class TableGrid extends Grid {
             $sortBy = Request::input('sort_by');
             if ($column->getColumnId() == $sortBy) {
                 return Request::input('sort_dir', 'desc') == 'desc' ? 'asc' : 'desc';
-            } else if (!empty($sortBy)) {
+            } else if (empty($sortBy)) {
                 // read default order from query
                 $default = $this->getQueryBuilder()->orders;
                 if (!empty($default)) {
