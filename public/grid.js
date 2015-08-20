@@ -15,7 +15,7 @@ var Grid = function($container, options) {
     this.options = {
         history: true,
         loadingClass: 'loading',
-        fields: 'input.js-grid-input, select.js-grid-input',
+        fields: 'input.js-grid-input, select.js-grid-input, .js-grid-fields input, .js-grid-fields select',
         onSuccess: function(result, _me){},
         beforeSend: function(xhr){}
     };
@@ -144,7 +144,7 @@ Grid.prototype = {
         this.history(url + fragment);
 
         // append ajax field
-        url += this.urlSeparator(url) + 'ajax=1';
+        url += this.urlSeparator(url) + 'ajax=1' + fragment;
 
         return url;
     },
