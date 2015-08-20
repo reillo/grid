@@ -12,6 +12,7 @@ class GridServiceProvider extends ServiceProvider {
     public function boot()
     {
         $this->package('reillo/grid', null, __DIR__);
+
     }
 
     /**
@@ -22,5 +23,9 @@ class GridServiceProvider extends ServiceProvider {
     public function register()
     {
         //
+        /*$routes = __DIR__ . '/Example/routes.php';
+        if (file_exists($routes)) require $routes;
+
+        $this->app['view']->addNamespace('grid', __DIR__.'/views');*/
     }
 }

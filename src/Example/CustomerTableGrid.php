@@ -1,7 +1,7 @@
 <?php namespace Reillo\Grid\Example;
 
 use Customer;
-use Input;
+use Request;
 use Reillo\Grid\Table\Column\Common;
 use Reillo\Grid\TableGrid;
 use Reillo\Grid\Traits\RemovableFiltersTrait;
@@ -14,15 +14,14 @@ class CustomerTableGrid extends TableGrid {
     {
         $query = (new Customer)->newQuery();
         $this->setQuery($query);
-        $this->setQuerySelect('*');
     }
 
     protected function prepareFilters()
     {
-        if (Input::get('email')) {
-            $this->getQuery()->where('email','LIKE' ,'%'.Input::get('email').'%');
+        if (Request::input('email')) {
+            $this->getQuery()->where('email','LIKE' ,'%'.Request::input('email').'%');
 
-            $this->addRemovableFilter('email', ('Email: '.Input::get('email')), [
+            $this->addRemovableFilter('email', ('Email: '.Request::input('email')), [
                 'email' => null
             ]);
         }

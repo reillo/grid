@@ -1,7 +1,7 @@
 <?php namespace Reillo\Grid\Example;
 
-use Input;
 use Listing;
+use Request;
 use Reillo\Grid\ListGrid;
 use Reillo\Grid\Traits\RemovableFiltersTrait;
 
@@ -21,28 +21,28 @@ class CustomerListGrid extends ListGrid {
     {
         $query = Listing::active()->leftJoin('customers', 'customers.id', '=', 'listings.customer_id');
         $query->with('customer');
-        $this->setQuery($query);
-
-        $this->setQuerySelect([
+        $query->select([
             'customers.*',
             'listings.*',
         ]);
+
+        $this->setQuery($query);
     }
 
     protected function prepareFilters()
     {
-        if (Input::get('email')) {
-            $this->getQuery()->where('customers.email','LIKE' ,'%'.Input::get('email').'%');
+        if (Request::input('email')) {
+            $this->getQuery()->where('customers.email','LIKE' ,'%'.Request::input('email').'%');
 
-            $this->addRemovableFilter('email', ('Email: '.Input::get('email')), [
+            $this->addRemovableFilter('email', ('Email: '.Request::input('email')), [
                 'email' => null
             ]);
         }
-        if (Input::get('status')) {
+        if (Request::input('status')) {
 
-            $this->getQuery()->whereIn('listings.listing_status', Input::get('status', []));
+            $this->getQuery()->whereIn('listings.listing_status', Request::input('status', []));
 
-            $this->addRemovableFilter('status[]', ('Status: '.join(', ', Input::get('status', []))), [
+            $this->addRemovableFilter('status[]', ('Status: '.join(', ', Request::input('status', []))), [
                 'status' => null
             ]);
         }

@@ -2,7 +2,6 @@
 
 Route::get('/grid/table', function() {
     $grid = new Reillo\Grid\Example\CustomerTableGrid();
-//    $grid->fragment('tab1');
     $grid->removeColumn('confirmation_code');
     $grid->addColumnAfter('first_name', [
         'label' => 'First name',

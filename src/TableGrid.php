@@ -1,6 +1,6 @@
 <?php namespace Reillo\Grid;
 
-use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Request;
 use Reillo\Grid\Helpers\Utils;
 use Reillo\Grid\Table\Column;
 use Reillo\Grid\Renderer\TableRenderer;
@@ -20,12 +20,9 @@ abstract class TableGrid extends Grid {
     function __construct()
     {
         parent::__construct();
+        $this->setRendererView(Utils::config('view.renderer.table'));
+        $this->setRenderer(new TableRenderer());
 
-        $renderer = (new TableRenderer());
-        $renderer->setView(Utils::config('renderer.table.table_view'));
-        $renderer->setHeaderView(Utils::config('renderer.table.table_header_view'));
-
-        $this->setRenderer($renderer);
         $this->prepareColumns();
     }
 
@@ -35,6 +32,19 @@ abstract class TableGrid extends Grid {
      * @return Void
      */
     abstract protected function prepareColumns();
+
+    /**
+     * Prepare Grid
+     *
+     * @return $this
+     */
+    public function prepareGrid()
+    {
+        parent::prepareGrid();
+
+        $this->getRenderer()->setColumns($this->columns);
+        return $this;
+    }
 
     /**
      * Get grid renderer
@@ -47,38 +57,6 @@ abstract class TableGrid extends Grid {
     }
 
     /**
-     * Prepare grid rendered
-     *
-     * @return $this
-     */
-    protected function prepareGridRenderer()
-    {
-        $this->getRenderer()
-            ->setItems($this->getItemCollections())
-            ->setColumns($this->columns)
-            ->setGrid($this);
-
-        return $this;
-    }
-
-    /**
-     * Create Column instance
-     *
-     * @param $column_id string|Column
-     * @param $options array
-     * @return Column
-     */
-    private function createColumnInstance($column_id, array $options = [])
-    {
-        // is an instance of column?
-        if ($column_id instanceof Column) {
-            return $column_id;
-        }
-
-        return (new Column($column_id, $options));
-    }
-
-    /**
      * Add Column
      *
      * @param $column_id string|Column
@@ -86,7 +64,7 @@ abstract class TableGrid extends Grid {
      */
     public function addColumn($column_id, $options = []) {
         // if column id is an instance of Column?
-        $column = $this->createColumnInstance($column_id, $options);
+        $column = Column::make($column_id, $options);
         $this->columns[$column->getColumnId()] = $column;
     }
 
@@ -94,7 +72,7 @@ abstract class TableGrid extends Grid {
      * Add column before column key id
      *
      * @todo refactor ?
-     * @param $column_id
+     * @param string|Column $column_id
      * @param array $options
      * @param string $before
      * @return Void
@@ -102,7 +80,7 @@ abstract class TableGrid extends Grid {
     public function addColumnBefore($column_id, $options = [], $before = null)
     {
         $new = [];
-        $column = $this->createColumnInstance($column_id, $options);
+        $column = Column::make($column_id, $options);
         foreach ($this->columns as $key=>$value) {
             if ($before == $key) $new[$column->getColumnId()] = $column;
             $new[$key] = $value;
@@ -114,14 +92,14 @@ abstract class TableGrid extends Grid {
      * Add column after column key id
      *
      * @todo refactor ?
-     * @param $column_id
-     * @param $options
-     * @param $after
+     * @param string|Column $column_id
+     * @param array         $options
+     * @param null|string   $after
      */
     public function addColumnAfter($column_id, $options = [], $after = null)
     {
         $new = [];
-        $column = $this->createColumnInstance($column_id, $options);
+        $column = Column::make($column_id, $options);
         foreach ($this->columns as $key=>$value) {
             $new[$key] = $value;
             if ($after == $key) $new[$column->getColumnId()] = $column;
@@ -132,7 +110,7 @@ abstract class TableGrid extends Grid {
     /**
      * Remove Column
      *
-     * @param $column_id
+     * @param string $column_id
      * @return void
      */
     public function removeColumn($column_id)
@@ -153,9 +131,25 @@ abstract class TableGrid extends Grid {
         /**@var $column Column*/
         foreach ($this->columns as $column) {
             if ($dir = $this->getSortableDir($column)) {
+                // remove default orders by
+                $this->getQueryBuilder()->orders = [];
                 $this->getQuery()->orderBy($column->getColumn(), $dir);
             }
         }
+    }
+
+    /**
+     * Get the query builder
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    protected function getQueryBuilder()
+    {
+        if ($this->getQuery() instanceof \Illuminate\Database\Query\Builder) {
+            return  $this->getQuery();
+        }
+
+        return $this->getQuery()->getQuery();
     }
 
     /**
@@ -179,13 +173,27 @@ abstract class TableGrid extends Grid {
     /**
      * Sortable column method
      *
-     * @param Column $column
+     * @param  Column  $column
+     * @param  bool  $readDefault
      * @return null|string
      */
-    public function getSortableDir(Column $column)
+    public function getSortableDir(Column $column, $readDefault = true)
     {
-        if ($column->isSortable() && $column->getColumnId() == Input::get('sort_by')) {
-            return  Input::get('sort_dir', 'desc') == 'desc' ? 'asc' : 'desc';
+        if ($column->isSortable()) {
+            if ($column->getColumnId() == Request::input('sort_by')) {
+                return Request::input('sort_dir', 'desc') == 'desc' ? 'asc' : 'desc';
+            } else {
+                // read default order from query
+                if ($readDefault) {
+                    $default = $this->getQueryBuilder()->orders;
+                    if (!empty($default)) {
+                        $order = $this->getQueryBuilder()->orders[0];
+                        if (array_get($order, 'column') == $column->getColumn()) {
+                            return array_get($order, 'direction') == 'desc' ? 'asc' : 'desc';
+                        }
+                    }
+                }
+            }
         }
 
         return null;
@@ -201,10 +209,8 @@ abstract class TableGrid extends Grid {
         return [
             'replace' => [
                 'js-grid-renderer' => $this->renderGrid(),
-                'js-grid-pagination' => $this->render('grid::pagination'),
-                'js-grid-pagination-info' => $this->render('grid::pagination_info'),
-                'js-grid-removable-filter' => $this->render('grid::removable_filter'),
-                // 'js-grid-per-page' => $this->render('grid::per_page'),
+                'js-grid-pagination' => $this->renderPagination(),
+                'js-grid-pagination-info' => $this->renderPaginationInfo(),
             ],
             'status' => 'success'
         ];

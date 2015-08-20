@@ -15,7 +15,7 @@
             @endforeach
         @else
             <tr class="grid-no-items">
-                <td colspan="{{ $renderer->getTotalColumns() }}">No results found.</td>
+                <td colspan="{{ $renderer->getTotalColumns() }}">{{ $renderer->renderNoResult() }}</td>
             </tr>
         @endif
     </tbody>

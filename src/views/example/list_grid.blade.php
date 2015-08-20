@@ -27,7 +27,7 @@
                     </div>
                 </div>
 
-                {{ $grid->render('grid::removable_filter') }}
+                {{ $grid->renderRemovableFilter() }}
 
                 <div class="grid-list-wrapper">
                     <div class="waiting"><i class="fa fa-spin fa-spinner"></i></div>
@@ -35,16 +35,16 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-4">
-                        {{ $grid->render('grid::per_page') }}
+                        {{ $grid->renderPerPage() }}
                     </div>
                     <div class="col-sm-8">
                         <div class="pull-right clearfix">
-                            {{ $grid->render('grid::pagination') }}
+                            {{ $grid->renderPagination() }}
                         </div>
                     </div>
                 </div>
 
-                {{ $grid->render('grid::pagination_info') }}
+                {{ $grid->renderPaginationInfo() }}
             </div>
         </div>
     </div>

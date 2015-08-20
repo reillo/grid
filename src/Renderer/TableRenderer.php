@@ -1,5 +1,6 @@
 <?php namespace Reillo\Grid\Renderer;
 
+use Illuminate\Support\Facades\View;
 use Reillo\Grid\Helpers\Utils;
 use Reillo\Grid\Interfaces\GridRendererInterface;
 
@@ -13,17 +14,20 @@ class TableRenderer extends RendererAbstract implements GridRendererInterface {
     /**
      * @var $view string
      */
-    protected $view;
-
-    /**
-     * @var $view string
-     */
     protected $headerView;
 
     /**
      * @var $headerCached string
      */
     protected $headerCached;
+
+    /**
+     * Create new instance
+     */
+    function __construct()
+    {
+        $this->headerView = Utils::config('view.renderer.table_header');
+    }
 
     /**
      * Set collection of columns
@@ -55,18 +59,6 @@ class TableRenderer extends RendererAbstract implements GridRendererInterface {
     public function getTotalColumns()
     {
         return count($this->columns);
-    }
-
-    /**
-     * set view path
-     *
-     * @param $view string
-     * @return $this
-     */
-    public function setView($view)
-    {
-        $this->view = $view;
-        return $this;
     }
 
     /**
@@ -103,6 +95,7 @@ class TableRenderer extends RendererAbstract implements GridRendererInterface {
         if (!empty($this->headerCached)) {
             return $this->headerCached;
         }
+
         return $this->headerCached = View::make($this->headerView)->with($this->getViewData())->render();
     }
 
