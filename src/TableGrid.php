@@ -61,11 +61,14 @@ abstract class TableGrid extends Grid {
      *
      * @param $column_id string|Column
      * @param $options array
+     * @return $this
      */
     public function addColumn($column_id, $options = []) {
         // if column id is an instance of Column?
         $column = Column::make($column_id, $options);
         $this->columns[$column->getColumnId()] = $column;
+
+        return $this;
     }
 
     /**
@@ -75,7 +78,7 @@ abstract class TableGrid extends Grid {
      * @param string|Column $column_id
      * @param array $options
      * @param string $before
-     * @return Void
+     * @return $this
      */
     public function addColumnBefore($column_id, $options = [], $before = null)
     {
@@ -86,6 +89,8 @@ abstract class TableGrid extends Grid {
             $new[$key] = $value;
         }
         $this->columns = $new;
+
+        return $this;
     }
 
     /**
@@ -95,6 +100,7 @@ abstract class TableGrid extends Grid {
      * @param string|Column $column_id
      * @param array         $options
      * @param null|string   $after
+     * @return $this
      */
     public function addColumnAfter($column_id, $options = [], $after = null)
     {
@@ -105,13 +111,15 @@ abstract class TableGrid extends Grid {
             if ($after == $key) $new[$column->getColumnId()] = $column;
         }
         $this->columns = $new;
+
+        return $this;
     }
 
     /**
      * Remove Column
      *
      * @param string $column_id
-     * @return void
+     * @return $this
      */
     public function removeColumn($column_id)
     {
@@ -119,6 +127,8 @@ abstract class TableGrid extends Grid {
         foreach ($column_id as $key) {
             unset($this->columns[$key]);
         }
+
+        return $this;
     }
 
     /**
